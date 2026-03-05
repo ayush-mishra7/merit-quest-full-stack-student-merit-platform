@@ -1,0 +1,43 @@
+# === IDE ===
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Backend (Java / Gradle) ===
+backend/build/
+backend/.gradle/
+backend/bin/
+backend/out/
+backend/*.class
+backend/*.jar
+backend/*.war
+
+# === Frontend (Node) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+
+# === ML Service (Python) ===
+ml-service/__pycache__/
+ml-service/*.pyc
+ml-service/.venv/
+ml-service/venv/
+ml-service/*.egg-info/
+
+# === Docker ===
+docker-compose.override.yml
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+
+# === Logs ===
+*.log
+logs/
