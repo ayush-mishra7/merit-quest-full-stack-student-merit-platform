@@ -53,7 +53,7 @@ VALUES ('Merit Quest Central', 'MQ-CENTRAL', 'SCHOOL', 'CBSE', 'Central', 'Delhi
 INSERT INTO users (email, password_hash, first_name, last_name, role, status, institution_id)
 VALUES (
     'admin@meritquest.dev',
-    '$2a$12$LJ3m4ys3LOwMNRPyfXm9reHKiGQSqFvGH0mVpjaveOyBmhY0GWehm',
+    '$2b$12$w2onbXUhHDjen/E7GsuWyeTrGsuu4YFh0JhZ/vR74jsXGoOx4AklW',
     'System',
     'Admin',
     'SYSTEM_ADMIN',

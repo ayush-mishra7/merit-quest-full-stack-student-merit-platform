@@ -6,7 +6,7 @@ spring:
     name: merit-quest
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/meritquest
+    url: jdbc:postgresql://localhost:5434/meritquest
     username: meritquest
     password: meritquest_dev
     hikari:
@@ -30,7 +30,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379
+      port: 6380
 
   servlet:
     multipart:
