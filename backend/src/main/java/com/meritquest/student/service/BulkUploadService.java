@@ -2,6 +2,7 @@ package com.meritquest.student.service;
 
 import com.meritquest.common.exception.ResourceNotFoundException;
 import com.meritquest.common.model.Gender;
+import com.meritquest.common.model.RecordType;
 import com.meritquest.common.model.UploadStatus;
 import com.meritquest.common.model.UploadType;
 import com.meritquest.student.dto.BulkUploadResponse;
@@ -12,6 +13,7 @@ import com.meritquest.student.repository.StudentRepository;
 import com.meritquest.user.entity.Institution;
 import com.meritquest.user.entity.User;
 import com.meritquest.user.repository.InstitutionRepository;
+import com.meritquest.verification.service.VerificationService;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class BulkUploadService {
     private final BulkUploadRepository bulkUploadRepository;
     private final StudentRepository studentRepository;
     private final InstitutionRepository institutionRepository;
+    private final VerificationService verificationService;
 
     private static final Set<String> REQUIRED_HEADERS = Set.of(
             "enrollment_number", "first_name", "last_name", "date_of_birth", "gender", "grade"
@@ -176,6 +179,8 @@ public class BulkUploadService {
                             .build();
 
                     studentRepository.save(student);
+                    verificationService.submitForVerification(
+                            RecordType.STUDENT, student.getId(), upload.getUploadedBy(), institutionId);
                     successCount++;
                 } catch (Exception e) {
                     errors.add(Map.of("row", String.valueOf(rowNum), "errors", "Unexpected error: " + e.getMessage()));

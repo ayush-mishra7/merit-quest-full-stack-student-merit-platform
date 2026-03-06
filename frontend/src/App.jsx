@@ -7,6 +7,8 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import StudentManagement from './pages/school/StudentManagement';
 import BulkUpload from './pages/school/BulkUpload';
+import VerificationQueue from './pages/verification/VerificationQueue';
+import AuditLogViewer from './pages/audit/AuditLogViewer';
 
 export default function App() {
   return (
@@ -34,10 +36,10 @@ export default function App() {
         <Route path="/students" element={<StudentManagement />} />
         <Route path="/upload" element={<BulkUpload />} />
         <Route path="/certificates" element={<Placeholder title="Certificates" />} />
-        <Route path="/verification" element={<Placeholder title="Verification Queue" />} />
+        <Route path="/verification" element={<VerificationQueue />} />
         <Route path="/analytics" element={<Placeholder title="Analytics" />} />
         <Route path="/applicants" element={<Placeholder title="Applicants" />} />
-        <Route path="/audit-log" element={<Placeholder title="Audit Log" />} />
+        <Route path="/audit-log" element={<AuditLogViewer />} />
         <Route path="/admin/users" element={<Placeholder title="User Management" />} />
         <Route path="/admin/institutions" element={<Placeholder title="Institutions" />} />
         <Route path="/admin/ml-models" element={<Placeholder title="ML Models" />} />

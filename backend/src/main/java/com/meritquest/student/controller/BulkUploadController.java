@@ -1,5 +1,6 @@
 package com.meritquest.student.controller;
 
+import com.meritquest.audit.AuditLogged;
 import com.meritquest.common.dto.ApiResponse;
 import com.meritquest.common.model.UploadType;
 import com.meritquest.student.dto.BulkUploadResponse;
@@ -26,6 +27,7 @@ public class BulkUploadController {
     private final BulkUploadService bulkUploadService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @AuditLogged(action = "BULK_UPLOAD", entityType = "BULK_UPLOAD")
     public ResponseEntity<ApiResponse<BulkUploadResponse>> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "type", defaultValue = "STUDENTS") UploadType uploadType,

@@ -1,5 +1,6 @@
 package com.meritquest.student.controller;
 
+import com.meritquest.audit.AuditLogged;
 import com.meritquest.common.dto.ApiResponse;
 import com.meritquest.student.dto.StudentRequest;
 import com.meritquest.student.dto.StudentResponse;
@@ -42,15 +43,17 @@ public class StudentController {
     }
 
     @PostMapping
+    @AuditLogged(action = "CREATE_STUDENT", entityType = "STUDENT")
     public ResponseEntity<ApiResponse<StudentResponse>> createStudent(
             @Valid @RequestBody StudentRequest request,
             @AuthenticationPrincipal User user) {
         Long institutionId = user.getInstitution().getId();
-        StudentResponse response = studentService.createStudent(request, institutionId);
+        StudentResponse response = studentService.createStudent(request, institutionId, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Student created", response));
     }
 
     @PutMapping("/{id}")
+    @AuditLogged(action = "UPDATE_STUDENT", entityType = "STUDENT")
     public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(
             @PathVariable Long id,
             @Valid @RequestBody StudentRequest request,
@@ -60,6 +63,7 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
+    @AuditLogged(action = "DELETE_STUDENT", entityType = "STUDENT")
     public ResponseEntity<ApiResponse<Void>> deleteStudent(
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {

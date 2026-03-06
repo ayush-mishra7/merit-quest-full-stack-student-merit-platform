@@ -1,5 +1,6 @@
 package com.meritquest.student.controller;
 
+import com.meritquest.audit.AuditLogged;
 import com.meritquest.common.dto.ApiResponse;
 import com.meritquest.student.dto.CertificateRequest;
 import com.meritquest.student.dto.CertificateResponse;
@@ -27,6 +28,7 @@ public class CertificateController {
     private final CertificateService certificateService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @AuditLogged(action = "UPLOAD_CERTIFICATE", entityType = "CERTIFICATE")
     public ResponseEntity<ApiResponse<CertificateResponse>> upload(
             @RequestPart("file") MultipartFile file,
             @RequestPart("data") @Valid CertificateRequest request,
@@ -54,6 +56,7 @@ public class CertificateController {
     }
 
     @DeleteMapping("/{id}")
+    @AuditLogged(action = "DELETE_CERTIFICATE", entityType = "CERTIFICATE")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {

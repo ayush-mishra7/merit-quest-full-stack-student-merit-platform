@@ -7,7 +7,10 @@ import com.meritquest.student.dto.StudentResponse;
 import com.meritquest.student.entity.Student;
 import com.meritquest.student.repository.StudentRepository;
 import com.meritquest.user.entity.Institution;
+import com.meritquest.user.entity.User;
 import com.meritquest.user.repository.InstitutionRepository;
+import com.meritquest.common.model.RecordType;
+import com.meritquest.verification.service.VerificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +23,7 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final InstitutionRepository institutionRepository;
+    private final VerificationService verificationService;
 
     @Transactional(readOnly = true)
     public Page<StudentResponse> getStudents(Long institutionId, String grade, Pageable pageable) {
@@ -39,7 +43,7 @@ public class StudentService {
     }
 
     @Transactional
-    public StudentResponse createStudent(StudentRequest request, Long institutionId) {
+    public StudentResponse createStudent(StudentRequest request, Long institutionId, User currentUser) {
         if (studentRepository.existsByEnrollmentNumberAndInstitutionId(request.getEnrollmentNumber(), institutionId)) {
             throw new DuplicateResourceException("Student with enrollment number " + request.getEnrollmentNumber() + " already exists");
         }
@@ -62,7 +66,9 @@ public class StudentService {
                 .institution(institution)
                 .build();
 
-        return toResponse(studentRepository.save(student));
+        Student saved = studentRepository.save(student);
+        verificationService.submitForVerification(RecordType.STUDENT, saved.getId(), currentUser, institutionId);
+        return toResponse(saved);
     }
 
     @Transactional

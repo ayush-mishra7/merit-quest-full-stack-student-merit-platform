@@ -1,6 +1,7 @@
 package com.meritquest.student.entity;
 
 import com.meritquest.common.model.Gender;
+import com.meritquest.common.model.VerificationStatus;
 import com.meritquest.user.entity.Institution;
 import com.meritquest.user.entity.User;
 import jakarta.persistence.*;
@@ -65,6 +66,11 @@ public class Student {
     @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "verification_status", nullable = false, columnDefinition = "verification_status")
+    @Builder.Default
+    private VerificationStatus verificationStatus = VerificationStatus.PENDING_VERIFICATION;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
