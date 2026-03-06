@@ -16,7 +16,7 @@
 <br />
 
 <img src="https://img.shields.io/badge/Status-In%20Development-orange?style=flat-square" alt="Status" />
-<img src="https://img.shields.io/badge/Phase-3%20of%208-blue?style=flat-square" alt="Phase" />
+<img src="https://img.shields.io/badge/Phase-4%20of%208-blue?style=flat-square" alt="Phase" />
 <img src="https://img.shields.io/github/last-commit/ayush-mishra7/merit-quest-full-stack-student-merit-platform?style=flat-square&color=green" alt="Last Commit" />
 
 ---
@@ -224,14 +224,20 @@ merit-quest/
 │   │   │   ├── repository/        # Spring Data repositories
 │   │   │   └── service/           # UserService (UserDetailsService)
 │   │   └── verification/          # Verification workflow
-│   │       ├── controller/        # VerificationController
-│   │       ├── dto/               # VerificationDecisionRequest/ItemResponse
-│   │       ├── entity/            # VerificationItem
-│   │       ├── repository/        # VerificationRepository
-│   │       └── service/           # VerificationService
+│   │   │   ├── controller/        # VerificationController
+│   │   │   ├── dto/               # VerificationDecisionRequest/ItemResponse
+│   │   │   ├── entity/            # VerificationItem
+│   │   │   ├── repository/        # VerificationRepository
+│   │   │   └── service/           # VerificationService
+│   │   └── merit/                 # Merit calculation engine
+│   │       ├── controller/        # MeritController (calculate, lists, config)
+│   │       ├── dto/               # MeritScoreResponse, BatchResponse, etc.
+│   │       ├── entity/            # MeritScore, MeritCalculationBatch, MeritConfig
+│   │       ├── repository/        # Score/Batch/Config repositories
+│   │       └── service/           # MeritCalculationService, MeritConfigService
 │   ├── src/main/resources/
 │   │   ├── application.yml        # App configuration
-│   │   └── db/migration/          # Flyway SQL migrations (V1–V5)
+│   │   └── db/migration/          # Flyway SQL migrations (V1–V6)
 │   ├── build.gradle               # Gradle build config
 │   └── Dockerfile                 # Multi-stage Docker build
 │
@@ -239,7 +245,7 @@ merit-quest/
 │   ├── src/
 │   │   ├── components/            # Layout, Sidebar, ProtectedRoute
 │   │   ├── pages/                 # Login, Dashboard, StudentManagement,
-│   │   │                          # BulkUpload, VerificationQueue, AuditLogViewer
+│   │   │                          # BulkUpload, VerificationQueue, AuditLogViewer, MeritLists
 │   │   ├── services/              # Axios API client with JWT interceptor
 │   │   ├── store/                 # Zustand auth store (persisted)
 │   │   └── utils/                 # Role-based navigation config
@@ -428,6 +434,19 @@ docker-compose up --build
 |--------|----------|-------------|------|
 | `GET` | `/api/audit-logs` | List audit logs (filterable by entity) | SYSTEM_ADMIN, GOV_AUTHORITY |
 
+### Merit Calculation Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `POST` | `/api/merit/calculate` | Trigger merit calculation batch | SCHOOL_ADMIN, SYSTEM_ADMIN, GOV_AUTHORITY |
+| `GET` | `/api/merit/batches` | List calculation batches | SCHOOL_ADMIN, SYSTEM_ADMIN, GOV_AUTHORITY |
+| `GET` | `/api/merit/batches/{batchId}` | Get batch status & progress | SCHOOL_ADMIN, SYSTEM_ADMIN, GOV_AUTHORITY |
+| `GET` | `/api/merit/lists/{batchId}` | Get merit list by batch | Bearer Token |
+| `GET` | `/api/merit/lists?academicYear=&scope=&scopeId=` | Get merit list by year/scope | Bearer Token |
+| `GET` | `/api/merit/students/{studentId}/history` | Student score history | Bearer Token |
+| `GET` | `/api/merit/config` | Get weight configurations | SYSTEM_ADMIN, GOV_AUTHORITY |
+| `PUT` | `/api/merit/config` | Update weight configuration | SYSTEM_ADMIN |
+
 ### Sample Requests
 
 <details>
@@ -565,6 +584,65 @@ docker-compose up --build
 ```
 </details>
 
+<details>
+<summary><b>POST /api/merit/calculate</b> — Trigger Merit Calculation</summary>
+
+```json
+{
+  "scope": "SCHOOL",
+  "academicYear": "2025-2026",
+  "scopeId": "1"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Merit calculation started",
+  "data": {
+    "id": 1,
+    "scope": "SCHOOL",
+    "scopeId": "1",
+    "academicYear": "2025-2026",
+    "status": "RUNNING",
+    "totalStudents": 6,
+    "processed": 0,
+    "triggeredBy": "System Admin",
+    "startedAt": "2026-03-06T18:30:00"
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>GET /api/merit/lists/{batchId}</b> — Get Merit List</summary>
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Merit list retrieved",
+  "data": [
+    {
+      "enrollmentNumber": "STU-2026-001",
+      "studentName": "Rahul Sharma",
+      "grade": "10",
+      "institutionName": "Merit Quest Academy",
+      "academicZScore": 1.234567,
+      "attendanceZScore": 0.876543,
+      "activityZScore": 1.567890,
+      "certificateZScore": 0.654321,
+      "compositeScore": 1.123456,
+      "rankSchool": 1,
+      "rankDistrict": 3,
+      "rankState": 15
+    }
+  ]
+}
+```
+</details>
+
 ---
 
 ## 🔒 Security
@@ -591,7 +669,7 @@ docker-compose up --build
 | **Phase 1** | Foundation & Authentication | ✅ Complete |
 | **Phase 2** | Student Data Management & Bulk Upload | ✅ Complete |
 | **Phase 3** | Verification Workflow & Audit Logging | ✅ Complete |
-| **Phase 4** | Merit Calculation Engine (Z-score, rankings) | 🔲 Planned |
+| **Phase 4** | Merit Calculation Engine (Z-score, rankings) | ✅ Complete |
 | **Phase 5** | Analytics Dashboards (Recharts) | 🔲 Planned |
 | **Phase 6** | Scholarship Management | 🔲 Planned |
 | **Phase 7** | ML Pipeline — Dropout Prediction | 🔲 Planned |
@@ -643,6 +721,24 @@ docker-compose up --build
 │ submitted_by  FK │ │ performed_at     │     │ uploaded_by   FK │
 │ reviewed_at      │ └──────────────────┘     │ institution_id FK│
 └──────────────────┘                          └──────────────────┘
+
+┌──────────────────┐ ┌──────────────────────┐ ┌──────────────────┐
+│  merit_config    │ │merit_calculation_    │ │  merit_scores    │
+│                  │ │    batches           │ │                  │
+├──────────────────┤ ├──────────────────────┤ ├──────────────────┤
+│ id           PK  │ │ id             PK    │ │ id           PK  │
+│ config_key   UQ  │ │ scope                │ │ student_id   FK  │
+│ config_value     │ │ scope_id             │ │ batch_id     FK  │
+│ description      │ │ academic_year        │ │ academic_year    │
+│ updated_by   FK  │ │ status               │ │ academic_z_score │
+│ created_at       │ │ total_students       │ │ attendance_z     │
+│ updated_at       │ │ processed            │ │ activity_z       │
+└──────────────────┘ │ error_message        │ │ certificate_z    │
+                     │ triggered_by     FK  │ │ composite_score  │
+                     │ started_at           │ │ rank_school      │
+                     │ completed_at         │ │ rank_district    │
+                     └──────────────────────┘ │ rank_state       │
+                                              └──────────────────┘
 ```
 
 ---
