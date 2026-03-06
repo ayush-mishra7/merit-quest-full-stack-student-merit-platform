@@ -52,4 +52,9 @@ public interface MeritScoreRepository extends JpaRepository<MeritScore, Long> {
            "WHERE ms.batch.id = :batchId " +
            "ORDER BY ms.compositeScore DESC")
     List<MeritScore> findAllByBatchIdOrdered(@Param("batchId") Long batchId);
+
+    @Query("SELECT ms FROM MeritScore ms " +
+           "JOIN FETCH ms.student s " +
+           "JOIN FETCH s.institution")
+    List<MeritScore> findAllWithStudentAndInstitution();
 }
