@@ -9,6 +9,7 @@ import StudentManagement from './pages/school/StudentManagement';
 import BulkUpload from './pages/school/BulkUpload';
 import VerificationQueue from './pages/verification/VerificationQueue';
 import AuditLogViewer from './pages/audit/AuditLogViewer';
+import MeritLists from './pages/merit/MeritLists';
 
 export default function App() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
 
         {/* Placeholder routes (will be implemented in later phases) */}
         <Route path="/performance" element={<Placeholder title="Performance" />} />
-        <Route path="/merit" element={<Placeholder title="Merit Lists" />} />
+        <Route path="/merit" element={<MeritLists />} />
         <Route path="/scholarships" element={<Placeholder title="Scholarships" />} />
         <Route path="/alerts" element={<Placeholder title="Alerts" />} />
         <Route path="/students" element={<StudentManagement />} />
