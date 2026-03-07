@@ -27,6 +27,7 @@ export const useAuthStore = create(
               lastName: auth.lastName,
               role: auth.role,
               institutionId: auth.institutionId,
+              studentId: auth.studentId,
             },
             accessToken: auth.accessToken,
             refreshToken: auth.refreshToken,
@@ -55,6 +56,7 @@ export const useAuthStore = create(
               lastName: auth.lastName,
               role: auth.role,
               institutionId: auth.institutionId,
+              studentId: auth.studentId,
             },
             accessToken: auth.accessToken,
             refreshToken: auth.refreshToken,
@@ -90,6 +92,7 @@ export const useAuthStore = create(
               lastName: u.lastName,
               role: u.role,
               institutionId: u.institutionId,
+              studentId: u.studentId,
             },
           });
         } catch {

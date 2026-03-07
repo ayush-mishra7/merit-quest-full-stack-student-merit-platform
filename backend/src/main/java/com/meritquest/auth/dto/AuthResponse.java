@@ -18,4 +18,5 @@ public class AuthResponse {
     private String lastName;
     private Role role;
     private Long institutionId;
+    private Long studentId;
 }

@@ -120,23 +120,38 @@ export default function MeritLists() {
     }
   };
 
-  // CSV export
-  const exportCSV = () => {
-    if (!scores.length) return;
-    const headers = ['Rank (School)', 'Rank (District)', 'Rank (State)', 'Enrollment', 'Name', 'Grade', 'Section', 'Institution', 'Academic Z', 'Attendance Z', 'Activity Z', 'Certificate Z', 'Composite Score'];
-    const rows = scores.map(s => [
-      s.rankSchool, s.rankDistrict, s.rankState, s.enrollmentNumber, s.studentName,
-      s.grade, s.section, s.institutionName,
-      s.academicZScore, s.attendanceZScore, s.activityZScore, s.certificateZScore, s.compositeScore,
-    ]);
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `merit-list-batch-${selectedBatch?.id || 'export'}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  // CSV export — fetch ALL pages before exporting
+  const exportCSV = async () => {
+    if (!selectedBatch) return;
+    try {
+      let allScores = [];
+      let pg = 0;
+      let totalPg = 1;
+      while (pg < totalPg) {
+        const { data } = await api.get(`/merit/lists/${selectedBatch.id}`, { params: { page: pg, size: 200 } });
+        const result = data.data;
+        allScores = allScores.concat(result.content || []);
+        totalPg = result.totalPages || 1;
+        pg++;
+      }
+      if (!allScores.length) return;
+      const headers = ['Rank (School)', 'Rank (District)', 'Rank (State)', 'Enrollment', 'Name', 'Grade', 'Section', 'Institution', 'Academic Z', 'Attendance Z', 'Activity Z', 'Certificate Z', 'Composite Score'];
+      const rows = allScores.map(s => [
+        s.rankSchool, s.rankDistrict, s.rankState, s.enrollmentNumber, `"${s.studentName}"`,
+        s.grade, s.section, `"${s.institutionName || ''}"`,
+        s.academicZScore, s.attendanceZScore, s.activityZScore, s.certificateZScore, s.compositeScore,
+      ]);
+      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `merit-list-batch-${selectedBatch.id}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Failed to export CSV');
+    }
   };
 
   return (

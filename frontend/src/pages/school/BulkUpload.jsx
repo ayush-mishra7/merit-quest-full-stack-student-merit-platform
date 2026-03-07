@@ -10,11 +10,19 @@ const STATUS_CONFIG = {
   FAILED:     { icon: XCircle,      color: 'text-red-600',    bg: 'bg-red-50',    label: 'Failed' },
 };
 
+const UPLOAD_TYPES = [
+  { value: 'STUDENTS', label: 'Students', columns: 'enrollment_number, first_name, last_name, date_of_birth (YYYY-MM-DD), gender (MALE/FEMALE/OTHER), grade', optional: 'section, guardian_name, guardian_phone, guardian_email, address' },
+  { value: 'ACADEMIC_RECORDS', label: 'Academic Records', columns: 'enrollment_number, subject, exam_type, marks_obtained, max_marks, academic_year', optional: 'grade, semester' },
+  { value: 'ATTENDANCE', label: 'Attendance', columns: 'enrollment_number, date (YYYY-MM-DD), status (PRESENT/ABSENT/LATE), academic_year', optional: 'period, remarks' },
+  { value: 'ACTIVITIES', label: 'Activities', columns: 'enrollment_number, activity_name, activity_type, date (YYYY-MM-DD)', optional: 'description, achievement, points' },
+];
+
 export default function BulkUpload() {
   const [uploads, setUploads] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [selectedUpload, setSelectedUpload] = useState(null);
+  const [uploadType, setUploadType] = useState('STUDENTS');
   const fileInputRef = useRef(null);
 
   const fetchUploads = useCallback(async () => {
@@ -25,6 +33,23 @@ export default function BulkUpload() {
   }, []);
 
   useEffect(() => { fetchUploads(); }, [fetchUploads]);
+
+  const downloadTemplate = (type) => {
+    const templates = {
+      STUDENTS: 'enrollment_number,first_name,last_name,date_of_birth,gender,grade,section,guardian_name,guardian_phone,guardian_email,address\nSTU-001,Aarav,Sharma,2008-05-15,MALE,10,A,Rajesh Sharma,9876543210,rajesh@example.com,Mumbai',
+      ACADEMIC_RECORDS: 'enrollment_number,subject,exam_type,marks_obtained,max_marks,academic_year,grade,semester\nSTU-001,Mathematics,MIDTERM,85,100,2025-2026,10,1',
+      ATTENDANCE: 'enrollment_number,date,status,academic_year,period,remarks\nSTU-001,2025-01-15,PRESENT,2025-2026,1,On time',
+      ACTIVITIES: 'enrollment_number,activity_name,activity_type,date,description,achievement,points\nSTU-001,Science Fair,ACADEMIC,2025-02-10,Built a solar model,First Prize,100',
+    };
+    const csv = templates[type] || '';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${type.toLowerCase()}-template.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Poll for processing uploads
   useEffect(() => {
@@ -46,7 +71,7 @@ export default function BulkUpload() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('type', 'STUDENTS');
+      formData.append('type', uploadType);
       await api.post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -75,7 +100,20 @@ export default function BulkUpload() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Bulk Upload</h1>
-        <p className="text-sm text-gray-500 mt-1">Upload CSV or Excel files to import student data</p>
+        <p className="text-sm text-gray-500 mt-1">Upload CSV or Excel files to import data</p>
+      </div>
+
+      {/* Upload type selector */}
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-sm font-medium text-gray-700">Upload Type:</label>
+        {UPLOAD_TYPES.map(t => (
+          <button key={t.value} onClick={() => setUploadType(t.value)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              uploadType === t.value
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}>{t.label}</button>
+        ))}
       </div>
 
       {/* Drop zone */}
@@ -106,14 +144,25 @@ export default function BulkUpload() {
       </motion.div>
 
       {/* Template info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-        <div className="text-sm text-blue-800">
-          <p className="font-medium">CSV/Excel Template</p>
-          <p className="mt-1">Required columns: <span className="font-mono text-xs">enrollment_number, first_name, last_name, date_of_birth (YYYY-MM-DD), gender (MALE/FEMALE/OTHER), grade</span></p>
-          <p className="mt-0.5">Optional columns: <span className="font-mono text-xs">section, guardian_name, guardian_phone, guardian_email, address</span></p>
-        </div>
-      </div>
+      {(() => {
+        const type = UPLOAD_TYPES.find(t => t.value === uploadType);
+        return (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-blue-800 flex-1">
+              <div className="flex items-center justify-between">
+                <p className="font-medium">CSV/Excel Template — {type?.label}</p>
+                <button onClick={() => downloadTemplate(uploadType)}
+                  className="text-xs px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                  Download Template
+                </button>
+              </div>
+              <p className="mt-1">Required columns: <span className="font-mono text-xs">{type?.columns}</span></p>
+              <p className="mt-0.5">Optional columns: <span className="font-mono text-xs">{type?.optional}</span></p>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Upload history */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">

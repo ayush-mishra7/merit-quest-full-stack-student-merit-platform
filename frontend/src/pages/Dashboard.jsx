@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import {
   BarChart3, Users, ClipboardCheck, Award, GraduationCap, Shield, BookOpen,
@@ -11,9 +12,9 @@ const ROLE_CONFIG = {
     icon: GraduationCap,
     color: 'primary',
     cards: [
-      { title: 'My Performance',  desc: 'View grades, ranking, and trends',     icon: BarChart3 },
-      { title: 'Merit Score',     desc: 'Your composite merit ranking',          icon: Award },
-      { title: 'Scholarships',    desc: 'Discover and apply for scholarships',   icon: BookOpen },
+      { title: 'My Performance',  desc: 'View grades, ranking, and trends',     icon: BarChart3, path: '/performance' },
+      { title: 'Merit Score',     desc: 'Your composite merit ranking',          icon: Award, path: '/merit' },
+      { title: 'Scholarships',    desc: 'Discover and apply for scholarships',   icon: BookOpen, path: '/scholarships' },
     ],
   },
   PARENT: {
@@ -22,9 +23,9 @@ const ROLE_CONFIG = {
     icon: Users,
     color: 'primary',
     cards: [
-      { title: 'Child Performance', desc: 'Track academic progress',      icon: BarChart3 },
-      { title: 'Merit Ranking',     desc: 'See ranking across schools',    icon: Award },
-      { title: 'Scholarships',      desc: 'Scholarship opportunities',     icon: BookOpen },
+      { title: 'Child Performance', desc: 'Track academic progress',      icon: BarChart3, path: '/performance' },
+      { title: 'Merit Ranking',     desc: 'See ranking across schools',    icon: Award, path: '/merit' },
+      { title: 'Scholarships',      desc: 'Scholarship opportunities',     icon: BookOpen, path: '/scholarships' },
     ],
   },
   SCHOOL_ADMIN: {
@@ -33,10 +34,10 @@ const ROLE_CONFIG = {
     icon: Shield,
     color: 'accent',
     cards: [
-      { title: 'Student Records',  desc: 'Manage and upload student data',     icon: Users },
-      { title: 'Bulk Uploads',     desc: 'CSV / Excel batch import',            icon: ClipboardCheck },
-      { title: 'School Analytics', desc: 'Performance overview & trends',       icon: BarChart3 },
-      { title: 'Merit Lists',     desc: 'View school-level rankings',           icon: Award },
+      { title: 'Student Records',  desc: 'Manage and upload student data',     icon: Users, path: '/students' },
+      { title: 'Bulk Uploads',     desc: 'CSV / Excel batch import',            icon: ClipboardCheck, path: '/upload' },
+      { title: 'School Analytics', desc: 'Performance overview & trends',       icon: BarChart3, path: '/analytics' },
+      { title: 'Merit Lists',     desc: 'View school-level rankings',           icon: Award, path: '/merit' },
     ],
   },
   DATA_VERIFIER: {
@@ -45,9 +46,9 @@ const ROLE_CONFIG = {
     icon: ClipboardCheck,
     color: 'amber',
     cards: [
-      { title: 'Verification Queue', desc: 'Pending records to review',      icon: ClipboardCheck },
-      { title: 'Approved Records',   desc: 'Previously verified records',    icon: Award },
-      { title: 'Audit Log',          desc: 'Activity history',               icon: BarChart3 },
+      { title: 'Verification Queue', desc: 'Pending records to review',      icon: ClipboardCheck, path: '/verification' },
+      { title: 'Merit Lists',        desc: 'View merit rankings',            icon: Award, path: '/merit' },
+      { title: 'Audit Log',          desc: 'Activity history',               icon: BarChart3, path: '/audit-log' },
     ],
   },
   NGO_REP: {
@@ -56,9 +57,9 @@ const ROLE_CONFIG = {
     icon: BookOpen,
     color: 'green',
     cards: [
-      { title: 'Post Scholarship',  desc: 'Create new scholarship offers',     icon: BookOpen },
-      { title: 'Applicants',        desc: 'Review student applications',        icon: Users },
-      { title: 'Impact Analytics',  desc: 'Track reach and outcomes',           icon: BarChart3 },
+      { title: 'Post Scholarship',  desc: 'Create new scholarship offers',     icon: BookOpen, path: '/scholarships/create' },
+      { title: 'Applicants',        desc: 'Review student applications',        icon: Users, path: '/applicants' },
+      { title: 'Impact Analytics',  desc: 'Track reach and outcomes',           icon: BarChart3, path: '/analytics' },
     ],
   },
   GOV_AUTHORITY: {
@@ -67,10 +68,10 @@ const ROLE_CONFIG = {
     icon: Shield,
     color: 'indigo',
     cards: [
-      { title: 'Regional Analytics', desc: 'District and state performance',   icon: BarChart3 },
-      { title: 'Merit Rankings',     desc: 'Cross-school merit comparisons',   icon: Award },
-      { title: 'Scholarships',       desc: 'Manage government scholarships',   icon: BookOpen },
-      { title: 'Audit Logs',         desc: 'System activity audit trail',      icon: ClipboardCheck },
+      { title: 'Regional Analytics', desc: 'District and state performance',   icon: BarChart3, path: '/analytics' },
+      { title: 'Merit Rankings',     desc: 'Cross-school merit comparisons',   icon: Award, path: '/merit' },
+      { title: 'Scholarships',       desc: 'Manage government scholarships',   icon: BookOpen, path: '/scholarships' },
+      { title: 'Audit Logs',         desc: 'System activity audit trail',      icon: ClipboardCheck, path: '/audit-log' },
     ],
   },
   SYSTEM_ADMIN: {
@@ -79,11 +80,11 @@ const ROLE_CONFIG = {
     icon: Shield,
     color: 'red',
     cards: [
-      { title: 'User Management',   desc: 'Manage all users and roles',       icon: Users },
-      { title: 'Institutions',      desc: 'Manage schools and colleges',      icon: Shield },
-      { title: 'System Analytics',  desc: 'Platform-wide stats',              icon: BarChart3 },
-      { title: 'Audit Logs',        desc: 'Complete audit trail',             icon: ClipboardCheck },
-      { title: 'ML Models',         desc: 'Manage prediction models',         icon: Award },
+      { title: 'User Management',   desc: 'Manage all users and roles',       icon: Users, path: '/admin/users' },
+      { title: 'Institutions',      desc: 'Manage schools and colleges',      icon: Shield, path: '/admin/institutions' },
+      { title: 'System Analytics',  desc: 'Platform-wide stats',              icon: BarChart3, path: '/analytics' },
+      { title: 'Audit Logs',        desc: 'Complete audit trail',             icon: ClipboardCheck, path: '/audit-log' },
+      { title: 'ML Models',         desc: 'Manage prediction models',         icon: Award, path: '/admin/ml-models' },
     ],
   },
 };
@@ -99,6 +100,7 @@ const cardVariants = {
 
 export default function Dashboard() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const config = ROLE_CONFIG[user?.role] || ROLE_CONFIG.STUDENT;
   const Icon = config.icon;
 
@@ -131,6 +133,7 @@ export default function Dashboard() {
               animate="visible"
               variants={cardVariants}
               whileHover={{ scale: 1.02, y: -2 }}
+              onClick={() => navigate(card.path)}
               className="card cursor-pointer hover:shadow-md transition-shadow"
             >
               <div className="flex items-start gap-4">

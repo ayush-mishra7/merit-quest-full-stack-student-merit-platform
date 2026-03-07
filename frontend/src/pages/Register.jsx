@@ -6,7 +6,8 @@ import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
 const ROLES = [
-  { value: 'STUDENT',       label: 'Student / Parent' },
+  { value: 'STUDENT',       label: 'Student' },
+  { value: 'PARENT',        label: 'Parent' },
   { value: 'SCHOOL_ADMIN',  label: 'School Administrator' },
   { value: 'DATA_VERIFIER', label: 'Data Verifier' },
   { value: 'NGO_REP',       label: 'NGO Representative' },

@@ -17,6 +17,9 @@ import ScholarshipDetail from './pages/scholarship/ScholarshipDetail';
 import ScholarshipForm from './pages/scholarship/ScholarshipForm';
 import AlertPanel from './pages/ml/AlertPanel';
 import MLModelManagement from './pages/ml/MLModelManagement';
+import UserManagement from './pages/admin/UserManagement';
+import InstitutionManagement from './pages/admin/InstitutionManagement';
+import CertificateManagement from './pages/school/CertificateManagement';
 
 export default function App() {
   return (
@@ -36,26 +39,40 @@ export default function App() {
       >
         <Route path="/dashboard" element={<Dashboard />} />
 
-        {/* Placeholder routes (will be implemented in later phases) */}
-        <Route path="/performance" element={<StudentPerformance />} />
-        <Route path="/performance/:studentId" element={<StudentPerformance />} />
+        {/* Student & Parent */}
+        <Route path="/performance" element={<ProtectedRoute roles={['STUDENT','PARENT','SCHOOL_ADMIN','SYSTEM_ADMIN']}><StudentPerformance /></ProtectedRoute>} />
+        <Route path="/performance/:studentId" element={<ProtectedRoute roles={['STUDENT','PARENT','SCHOOL_ADMIN','SYSTEM_ADMIN']}><StudentPerformance /></ProtectedRoute>} />
+        <Route path="/my-applications" element={<ProtectedRoute roles={['STUDENT']}><ScholarshipList myApplications /></ProtectedRoute>} />
+
+        {/* Scholarships — viewable by many, create/edit restricted */}
         <Route path="/merit" element={<MeritLists />} />
         <Route path="/scholarships" element={<ScholarshipList />} />
-        <Route path="/scholarships/create" element={<ScholarshipForm />} />
         <Route path="/scholarships/:id" element={<ScholarshipDetail />} />
-        <Route path="/scholarships/:id/edit" element={<ScholarshipForm />} />
-        <Route path="/my-applications" element={<ScholarshipList myApplications />} />
-        <Route path="/alerts" element={<AlertPanel />} />
-        <Route path="/students" element={<StudentManagement />} />
-        <Route path="/upload" element={<BulkUpload />} />
-        <Route path="/certificates" element={<Placeholder title="Certificates" />} />
-        <Route path="/verification" element={<VerificationQueue />} />
-        <Route path="/analytics" element={<AnalyticsDashboard />} />
-        <Route path="/applicants" element={<ScholarshipList />} />
-        <Route path="/audit-log" element={<AuditLogViewer />} />
-        <Route path="/admin/users" element={<Placeholder title="User Management" />} />
-        <Route path="/admin/institutions" element={<Placeholder title="Institutions" />} />
-        <Route path="/admin/ml-models" element={<MLModelManagement />} />
+        <Route path="/scholarships/create" element={<ProtectedRoute roles={['NGO_REP','GOV_AUTHORITY','SYSTEM_ADMIN']}><ScholarshipForm /></ProtectedRoute>} />
+        <Route path="/scholarships/:id/edit" element={<ProtectedRoute roles={['NGO_REP','GOV_AUTHORITY','SYSTEM_ADMIN']}><ScholarshipForm /></ProtectedRoute>} />
+
+        {/* School Admin */}
+        <Route path="/students" element={<ProtectedRoute roles={['SCHOOL_ADMIN','SYSTEM_ADMIN']}><StudentManagement /></ProtectedRoute>} />
+        <Route path="/upload" element={<ProtectedRoute roles={['SCHOOL_ADMIN','SYSTEM_ADMIN']}><BulkUpload /></ProtectedRoute>} />
+        <Route path="/certificates" element={<ProtectedRoute roles={['SCHOOL_ADMIN','SYSTEM_ADMIN']}><CertificateManagement /></ProtectedRoute>} />
+        <Route path="/alerts" element={<ProtectedRoute roles={['STUDENT','PARENT','SCHOOL_ADMIN','SYSTEM_ADMIN']}><AlertPanel /></ProtectedRoute>} />
+
+        {/* Data Verifier */}
+        <Route path="/verification" element={<ProtectedRoute roles={['DATA_VERIFIER','SCHOOL_ADMIN','SYSTEM_ADMIN']}><VerificationQueue /></ProtectedRoute>} />
+
+        {/* Analytics — multi-role */}
+        <Route path="/analytics" element={<ProtectedRoute roles={['SCHOOL_ADMIN','NGO_REP','GOV_AUTHORITY','SYSTEM_ADMIN']}><AnalyticsDashboard /></ProtectedRoute>} />
+
+        {/* NGO */}
+        <Route path="/applicants" element={<ProtectedRoute roles={['NGO_REP','GOV_AUTHORITY','SYSTEM_ADMIN']}><ScholarshipList applicantView /></ProtectedRoute>} />
+
+        {/* Audit */}
+        <Route path="/audit-log" element={<ProtectedRoute roles={['DATA_VERIFIER','GOV_AUTHORITY','SYSTEM_ADMIN']}><AuditLogViewer /></ProtectedRoute>} />
+
+        {/* System Admin */}
+        <Route path="/admin/users" element={<ProtectedRoute roles={['SYSTEM_ADMIN']}><UserManagement /></ProtectedRoute>} />
+        <Route path="/admin/institutions" element={<ProtectedRoute roles={['SYSTEM_ADMIN']}><InstitutionManagement /></ProtectedRoute>} />
+        <Route path="/admin/ml-models" element={<ProtectedRoute roles={['SYSTEM_ADMIN']}><MLModelManagement /></ProtectedRoute>} />
       </Route>
 
       {/* Default redirect */}
@@ -64,11 +81,4 @@ export default function App() {
   );
 }
 
-function Placeholder({ title }) {
-  return (
-    <div className="card">
-      <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-      <p className="text-gray-500 mt-2">This feature will be implemented in a future phase.</p>
-    </div>
-  );
-}
+

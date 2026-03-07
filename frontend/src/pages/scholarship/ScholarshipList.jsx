@@ -24,7 +24,7 @@ const orgTypeColors = {
   PRIVATE: 'bg-orange-100 text-orange-700',
 };
 
-export default function ScholarshipList() {
+export default function ScholarshipList({ myApplications, applicantView }) {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [scholarships, setScholarships] = useState([]);
@@ -47,7 +47,15 @@ export default function ScholarshipList() {
     try {
       const params = { page, size: 12 };
       if (statusFilter) params.status = statusFilter;
-      const { data } = await api.get('/scholarships', { params });
+
+      let endpoint = '/scholarships';
+      if (myApplications) {
+        endpoint = '/scholarships/my-applications';
+      } else if (applicantView) {
+        endpoint = '/scholarships/mine';
+      }
+
+      const { data } = await api.get(endpoint, { params });
       setScholarships(data.data?.content || []);
       setTotalPages(data.data?.totalPages || 0);
     } catch (err) {
@@ -85,9 +93,11 @@ export default function ScholarshipList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Scholarships</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {myApplications ? 'My Applications' : applicantView ? 'Scholarship Applicants' : 'Scholarships'}
+          </h1>
           <p className="text-gray-500 mt-1">
-            {isStudent ? 'Browse and apply to available scholarships' : 'Manage scholarship programs'}
+            {myApplications ? 'Track your scholarship applications' : applicantView ? 'Review student applications for your scholarships' : isStudent ? 'Browse and apply to available scholarships' : 'Manage scholarship programs'}
           </p>
         </div>
         {canCreate && (

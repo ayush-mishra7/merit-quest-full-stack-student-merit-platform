@@ -3,6 +3,8 @@ package com.meritquest.auth.controller;
 import com.meritquest.auth.dto.*;
 import com.meritquest.auth.security.JwtTokenProvider;
 import com.meritquest.common.dto.ApiResponse;
+import com.meritquest.common.model.Role;
+import com.meritquest.student.repository.StudentRepository;
 import com.meritquest.user.entity.User;
 import com.meritquest.user.service.UserService;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final StudentRepository studentRepository;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
@@ -72,6 +75,7 @@ public class AuthController {
                 .lastName(user.getLastName())
                 .role(user.getRole())
                 .institutionId(user.getInstitution() != null ? user.getInstitution().getId() : null)
+                .studentId(resolveStudentId(user))
                 .build();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -90,6 +94,16 @@ public class AuthController {
                 .lastName(user.getLastName())
                 .role(user.getRole())
                 .institutionId(user.getInstitution() != null ? user.getInstitution().getId() : null)
+                .studentId(resolveStudentId(user))
                 .build();
+    }
+
+    private Long resolveStudentId(User user) {
+        if (user.getRole() == Role.STUDENT || user.getRole() == Role.PARENT) {
+            return studentRepository.findByUserId(user.getId())
+                    .map(s -> s.getId())
+                    .orElse(null);
+        }
+        return null;
     }
 }

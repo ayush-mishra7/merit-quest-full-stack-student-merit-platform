@@ -29,9 +29,10 @@ public class StudentController {
     public ResponseEntity<ApiResponse<Page<StudentResponse>>> listStudents(
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) String grade,
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 20) Pageable pageable) {
         Long institutionId = user.getInstitution().getId();
-        return ResponseEntity.ok(ApiResponse.success(studentService.getStudents(institutionId, grade, pageable)));
+        return ResponseEntity.ok(ApiResponse.success(studentService.getStudents(institutionId, grade, search, pageable)));
     }
 
     @GetMapping("/{id}")

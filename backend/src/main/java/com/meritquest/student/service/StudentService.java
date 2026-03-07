@@ -26,9 +26,16 @@ public class StudentService {
     private final VerificationService verificationService;
 
     @Transactional(readOnly = true)
-    public Page<StudentResponse> getStudents(Long institutionId, String grade, Pageable pageable) {
+    public Page<StudentResponse> getStudents(Long institutionId, String grade, String search, Pageable pageable) {
         Page<Student> page;
-        if (grade != null && !grade.isBlank()) {
+        boolean hasSearch = search != null && !search.isBlank();
+        boolean hasGrade = grade != null && !grade.isBlank();
+
+        if (hasSearch && hasGrade) {
+            page = studentRepository.searchByInstitutionAndGrade(institutionId, grade, search, pageable);
+        } else if (hasSearch) {
+            page = studentRepository.searchByInstitution(institutionId, search, pageable);
+        } else if (hasGrade) {
             page = studentRepository.findByInstitutionIdAndGrade(institutionId, grade, pageable);
         } else {
             page = studentRepository.findByInstitutionId(institutionId, pageable);

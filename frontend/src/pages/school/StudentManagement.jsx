@@ -29,6 +29,7 @@ export default function StudentManagement() {
     try {
       const params = { page, size: 20 };
       if (gradeFilter) params.grade = gradeFilter;
+      if (search) params.search = search;
       const { data } = await api.get('/students', { params });
       const pg = data.data;
       setStudents(pg.content || []);
@@ -38,7 +39,7 @@ export default function StudentManagement() {
     } finally {
       setLoading(false);
     }
-  }, [page, gradeFilter]);
+  }, [page, gradeFilter, search]);
 
   useEffect(() => { fetchStudents(); }, [fetchStudents]);
 
@@ -107,15 +108,11 @@ export default function StudentManagement() {
     } catch { /* ignore */ }
   };
 
-  const filtered = students.filter((s) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (
-      s.firstName.toLowerCase().includes(q) ||
-      s.lastName.toLowerCase().includes(q) ||
-      s.enrollmentNumber.toLowerCase().includes(q)
-    );
-  });
+  // Server-side search — reset page when search changes
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(0);
+  };
 
   return (
     <div className="space-y-6">
@@ -134,7 +131,7 @@ export default function StudentManagement() {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" placeholder="Search by name or enrollment..." value={search} onChange={(e) => setSearch(e.target.value)}
+          <input type="text" placeholder="Search by name or enrollment..." value={search} onChange={handleSearchChange}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
         </div>
         <input type="text" placeholder="Filter by grade" value={gradeFilter} onChange={(e) => { setGradeFilter(e.target.value); setPage(0); }}
@@ -155,9 +152,9 @@ export default function StudentManagement() {
             <tbody className="divide-y divide-gray-100">
               {loading ? (
                 <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
-              ) : filtered.length === 0 ? (
+              ) : students.length === 0 ? (
                 <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">No students found</td></tr>
-              ) : filtered.map((s) => (
+              ) : students.map((s) => (
                 <motion.tr key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-mono text-xs">{s.enrollmentNumber}</td>
                   <td className="px-4 py-3 font-medium">{s.firstName} {s.lastName}</td>

@@ -55,7 +55,8 @@ export default function AlertPanel() {
       } else if (user?.institutionId) {
         endpoint = `/alerts/institution/${user.institutionId}`;
       } else {
-        endpoint = `/alerts/institution/1`;
+        setLoading(false);
+        return;
       }
 
       const { data } = await api.get(endpoint, { params });
@@ -74,8 +75,9 @@ export default function AlertPanel() {
       if (isStudent) {
         endpoint = `/alerts/count/student/${user.id}`;
       } else {
-        endpoint = `/alerts/count/institution/${user?.institutionId || 1}`;
+        endpoint = `/alerts/count/institution/${user?.institutionId}`;
       }
+      if (!endpoint) return;
       const { data } = await api.get(endpoint);
       setUnackCount(data.data || 0);
     } catch { /* ignore */ }
@@ -94,7 +96,11 @@ export default function AlertPanel() {
 
   const handleGenerateAlerts = async () => {
     try {
-      const institutionId = user?.institutionId || 1;
+      const institutionId = user?.institutionId;
+      if (!institutionId) {
+        toast.error('No institution linked to your account');
+        return;
+      }
       const { data } = await api.post(`/alerts/generate/${institutionId}`);
       toast.success(`Generated ${data.data} new alerts`);
       fetchAlerts();
