@@ -83,7 +83,7 @@
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  background: white;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
   opacity: 0;
   transform: scale(0);
   transition: all 0.3s ease;
@@ -91,7 +91,7 @@
 }
 
 .gooey-nav-container nav ul li.active {
-  color: black;
+  color: white;
   text-shadow: none;
 }
 
@@ -114,14 +114,14 @@
 }
 
 .gooey-nav-container .effect.text {
-  color: white;
+  color: transparent;
   transition: color 0.3s ease;
   font-size: 0.8125rem;
   font-weight: 500;
 }
 
 .gooey-nav-container .effect.text.active {
-  color: black;
+  color: white;
 }
 
 .gooey-nav-container .effect.filter {
@@ -141,7 +141,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: white;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
   transform: scale(0);
   opacity: 0;
   z-index: -1;
