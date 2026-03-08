@@ -2,7 +2,7 @@
  * LandingPage – Premium 3D landing page with FluidGlass hero and scroll animations.
  * Uses framer-motion for scroll-triggered animations and Three.js for the 3D glass effect.
  */
-import { useRef, Suspense, lazy } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import {
@@ -29,8 +29,7 @@ import CountUp from '../components/ui/CountUp';
 import GlowButton from '../components/ui/GlowButton';
 import Particles from '../components/ui/Particles';
 import GooeyNav from '../components/ui/GooeyNav';
-
-const FluidGlass = lazy(() => import('../components/ui/FluidGlass'));
+import LiquidEther from '../components/ui/LiquidEther';
 
 /* ─── Section wrapper with scroll-triggered reveal ─── */
 function RevealSection({ children, className = '', delay = 0 }) {
@@ -74,7 +73,7 @@ function FloatingCard({ children, className = '', index = 0 }) {
   );
 }
 
-/* ─── Hero Section with FluidGlass ─── */
+/* ─── Hero Section with LiquidEther ─── */
 function HeroSection() {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -91,50 +90,40 @@ function HeroSection() {
       className="relative h-screen w-full overflow-hidden"
       style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
     >
-      {/* FluidGlass 3D Canvas */}
+      {/* LiquidEther Background */}
       <div className="absolute inset-0 z-0">
-        <Suspense
-          fallback={
-            <div className="h-full w-full bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#1e1b4b] flex items-center justify-center">
-              <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-            </div>
-          }
-        >
-          <FluidGlass
-            mode="lens"
-            pages={1.5}
-            bgColor={0x020617}
-            lensProps={{
-              ior: 1.2,
-              thickness: 3.5,
-              chromaticAberration: 0.06,
-              anisotropy: 0.02,
-            }}
-            textItems={[
-              { text: 'MERIT QUEST', y: 0.15, z: 12, size: 'hero', color: '#ffffff' },
-              { text: 'Student Merit Platform', y: -0.25, z: 12, size: 'sub', color: '#a5b4fc' },
-            ]}
-          />
-        </Suspense>
+        <LiquidEther
+          colors={['#4f46e5', '#7c3aed', '#a855f7', '#6366f1']}
+          autoDemo={true}
+          autoSpeed={0.6}
+          autoIntensity={2.5}
+          mouseForce={25}
+          cursorSize={120}
+          resolution={0.5}
+        />
       </div>
 
-      {/* Overlaid radial gradient for blending */}
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 z-10 pointer-events-none bg-[#020617]/40" />
       <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[#020617]" />
 
       {/* Hero content overlay */}
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pb-32 pointer-events-none">
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
           className="text-center pointer-events-auto"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span className="text-sm text-white/70">AI-Powered Student Merit Tracking</span>
           </div>
-          <p className="text-lg text-white/50 max-w-xl mx-auto mb-8">
-            Move the cursor over the glass lens to explore the 3D effect
+          <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-4 tracking-tight">
+            Merit <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent">Quest</span>
+          </h1>
+          <p className="text-lg md:text-xl text-white/50 max-w-xl mx-auto mb-8">
+            The next-generation platform for tracking, verifying, and celebrating student achievements
           </p>
           <div className="flex gap-4 justify-center">
             <Link to="/register">
